@@ -32,7 +32,9 @@ socketio = SocketIO(app) # Flask-SocketIO extension wrapper.                    
 
 # Global variables
 LED_GPIO_PIN = 21
+LED2_GPIO_PIN = 20
 led = None # PWMLED Instance. See init_led()
+led2 = None # PWMLED Instance. See init_led()
 state = {
     'level': 50 # 0..100 % brightless of LED.
 }
@@ -43,8 +45,11 @@ GPIO Related Functions
 def init_led():
     """Create and initialise PWMLED Object"""
     global led
+    global led2
     led =  PWMLED(LED_GPIO_PIN)
+    led2 =  PWMLED(LED2_GPIO_PIN)
     led.value = state['level'] / 100
+    led2.value = state['level'] / 100
 
 
 """
@@ -57,7 +62,7 @@ Flask & Flask-SocketIO Related Functions
 def index():
     """Make sure index_ws_client.html is in the templates folder
     relative to this Python file."""
-    return render_template('index_ws_client.html', pin=LED_GPIO_PIN)                 # (3)
+    return render_template('index_ws_client.html', pin=LED_GPIO_PIN, pin2=LED2_GPIO_PIN)                 # (3)
 
 
 # Flask-SocketIO Callback Handlers
@@ -94,6 +99,7 @@ def handle_state(data):                                                         
         # Set PWM duty cycle to adjust brightness level.
         # We are mapping input value 0-100 to 0-1
         led.value = new_level / 100                                                  # (12)
+        led2.value = new_level / 100                                                  # (12)
         logger.info("LED brightness level is " + str(new_level))
 
         state['level'] = new_level
